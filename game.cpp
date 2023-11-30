@@ -42,20 +42,16 @@ Player* Game::nextPlayer() const {
     return p[turn++ % 2];
 }
 
+// This method should check both player's boards to see if both have remaining battleships
 bool isRunning() const {
-    
-    /*
-    // For each board
-    for (int i = 0; i < 2; ++i) {
-        Board b = p[i]->getBoard();
-    }
-    */
+    // Will implement later
     // DUMMY return
     return true;
 }
 
 void Game::play() {
+    // Make sure players are selected first
     while(isRunning()) {
-
+        // Will implement later
     }
 }

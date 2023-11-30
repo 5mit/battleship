@@ -10,7 +10,8 @@ void Board::reset() {
     }
 
     // Temp code:
-    // make ships in this position:
+    // make ships in arbitrary fixed position:
+    // Implement a randomizer later
     for(int i = 0; i < 5; i++) {
         playerBoard[4 + i * 10] = PlayerPiece::AIRCRAFT;
 
@@ -30,7 +31,8 @@ void Board::reset() {
 
 }
 
-// What's the point of the boolean? can only compute move if it is the enemy's
+// INCOMPLETE
+// Will update this function to take another board object that belongs to the other player
 void Board::makeMove(Move m, bool playerMove) {
     std::size_t idx = m.getIndex();
     if (!playerMove) {
@@ -48,6 +50,8 @@ bool Board::isLegal(Move m) const {
     return idx < 100 && enemyBoard[idx] == EnemyPiece::EMPTY;
 } 
 
+
+// I will try to make this code more modular in order to reduce repetition
 std::ostream& operator<<( std::ostream& os , const Board& b) {
     os << "Enemy Board:\n";
     os << "  0 1 2 3 4 5 6 7 8 9 \n";

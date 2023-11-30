@@ -10,6 +10,7 @@ HumanPlayer::HumanPlayer(const std::string& n) : Player(n) {}
 Move HumanPlayer::getMove() {
     std::cout << name << " - Enter your move: ";
     
+    // Add imput validation
     Move m = Move();
     std::cin >> m.row;
     std::cin >> m.col;
