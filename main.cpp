@@ -12,4 +12,8 @@ int main() {
 
     Game g = Game();
 
+    g.selectPlayers();
+
+    g.play();
+    
 }

@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <limits>
 
 #include "humanplayer.h"
 #include "player.h"
@@ -8,15 +9,23 @@
 HumanPlayer::HumanPlayer(const std::string& n) : Player(n) {}
 
 Move HumanPlayer::getMove() {
-    std::cout << name << " - Enter your move: ";
     
-    // Add imput validation
-    Move m = Move();
-    std::cin >> m.row;
-    std::cin >> m.col;
+    Move move = Move();
 
-    std::cout << "your move: " << m.row << m.col << '\n';
+    do {
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
 
-    return m;
+        std::cout << name << " - Enter your move: ";
+        std::cin >> move.row;
+        std::cin >> move.col;
+        move.row = static_cast<char>(std::toupper(move.row)); // make row letter case insenstive 
+    } while (std::cin.fail());
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    return move;
 
 }
