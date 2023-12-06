@@ -4,37 +4,41 @@
 
 #include "board.h"
 
+// Initalizes boards by calling reset()
 Board::Board() {reset();}
 
+
 void Board::reset() {
+    // Set all pieces on both boards to "EMPTY",
     for(std::size_t i = 0; i < BOARD_SIZE; ++i){
         playerBoard[i] = PlayerPiece::EMPTY;
         enemyBoard[i] = EnemyPiece::EMPTY;
     }
 
-    const std::size_t indexToLength[] = {5, 4, 3, 3, 2};
-    const PlayerPiece indexToPiece[] = {PlayerPiece::AIRCRAFT, PlayerPiece::BATTLESHIP, PlayerPiece::CRUISER, PlayerPiece::SUBMARINE, PlayerPiece::PATROL};
-
+    // Create a device to generate random numbers
     std::random_device rd;
     std::mt19937_64 mt(rd());
     std::uniform_int_distribution<std::size_t> randomPosition(0, BOARD_LENGTH - 1);
 
-
-    for (std::size_t i = 0 ; i < 5; ++i) {
-        bool validPlacement;
-        bool vertical;
-        std::size_t startIndex;
-        std::size_t verticalMultipler, horizontalMultipler;
+    // Place each piece randomly on the board
+    for (std::size_t i = 0 ; i < NUM_PIECES; ++i) {
+        bool validPlacement; // Flag that states if generated ship placement is valid
+        bool vertical;       // Flag that states whether ship is oriented vertically or not
+        std::size_t startIndex; // Start Index of ship placement
+        std::size_t verticalMultipler, horizontalMultipler; // multipliers that account for placement being horizontal or vertical
         
-        
+        // Keep generating random placements for this ship until a valid one is found
         do {
-            validPlacement = true;
-            vertical = randomPosition(mt) % 2 == 0? true: false;
-            verticalMultipler = vertical == true? BOARD_LENGTH: 1;
+            validPlacement = true; 
+            vertical = randomPosition(mt) % 2 == 0? true: false; // randomly decide if ship is vertical or horizontal
+            // Adjust multipliers accordingly
+            verticalMultipler = vertical == true? BOARD_LENGTH: 1; 
             horizontalMultipler = vertical == false? BOARD_LENGTH: 1;
+            // Get a random start index within valid range
             startIndex = verticalMultipler * (randomPosition(mt) % (BOARD_LENGTH - indexToLength[i]) + 1);
             startIndex +=  horizontalMultipler * randomPosition(mt);
-            for (std::size_t j = 0; j < indexToLength[i] && validPlacement; j++) {
+            // See if that results in a valid placement
+            for (std::size_t j = 0; j < indexToLength[i] && validPlacement; ++j) {
                 if (playerBoard[startIndex + (j * verticalMultipler)] != PlayerPiece::EMPTY) {
                     validPlacement = false;
                 }
@@ -42,7 +46,7 @@ void Board::reset() {
         } while(!validPlacement);
         
         // Random placement has been chosen and valid so we can go ahead and place it on the board
-        for (std::size_t j = 0; j < indexToLength[i] || !validPlacement; j++) {
+        for (std::size_t j = 0; j < indexToLength[i] || !validPlacement; ++j, ++curNumberShipPieces) { // Also increment the number of ship pieces on board
             playerBoard[startIndex + (j * verticalMultipler)] = indexToPiece[i];
         }
 
@@ -50,14 +54,11 @@ void Board::reset() {
     } 
 }
 
-
+// Returns true if every place on board is empty. 
 bool Board::isEmpty() const {
-    for (PlayerPiece piece : playerBoard) {
-        if (piece != PlayerPiece::EMPTY) {
-            return false;
-        }
-    }
-    return true;
+
+    return curNumberShipPieces == 0;
+
 }
 
 
@@ -76,6 +77,7 @@ void Board::makeMove(Move m, Board& enemy, bool playerMove) {
     else {
         if (moveHits(m)) {
             playerBoard[idx] = PlayerPiece::EMPTY;
+            --curNumberShipPieces;
         }
     }
 
@@ -86,13 +88,12 @@ bool Board::moveHits(Move m) {
     return playerBoard[m.getIndex()] != PlayerPiece::EMPTY;
 }
 
-
+// returns true if move is within bounds of board and not already attempted.
 bool Board::isLegal(Move m) const {
     return m.isPossible() && enemyBoard[m.getIndex()] == EnemyPiece::EMPTY;
 } 
 
-
-// I will try to make this code more modular in order to reduce repetition
+// Prints both boards to screen
 std::ostream& operator<<( std::ostream& os , const Board& b) {
 
     os << "Enemy Board:\n";
@@ -106,16 +107,6 @@ std::ostream& operator<<( std::ostream& os , const Board& b) {
     } 
 
     os << '\n';
-
-/*             switch(b.playerBoard[i * BOARD_LENGTH + j]) {
-                case PlayerPiece::EMPTY:
-                    os << static_cast<char>(b.playerBoard[i * BOARD_LENGTH + j]);
-                    break;
-                default: // part of a ship:
-                    os << 'B';
-            } */
-            //os << ' ';
-
     os << "Player Board:\n";
     os << "  0 1 2 3 4 5 6 7 8 9 \n";
     for (std::size_t i = 0; i < BOARD_LENGTH; ++i) {

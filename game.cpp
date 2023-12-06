@@ -41,11 +41,6 @@ void Game::selectPlayers() {
 
 }
 
-// returns the index of to the next player and increases the turn counter in the process
-std::size_t Game::nextPlayer() const {
-    return turn % 2;
-}
-
 // This function checks both player's boards to see if they have any remaining battleships
 bool Game::isRunning() const {
     // For each player
@@ -65,35 +60,41 @@ void Game::announceWinner() {
     // the player who's turn is next was going to win before the last turn was played
     // (i.e we already know the other player's board is empty)
     // Thus, if this player's board is empty, it is a tie.
-    if (p[nextPlayer()]->getBoard().isEmpty()) {
+    if (nextPlayer()->getBoard().isEmpty()) {
         std::cout << "It's a tie!\n";
     }
     // otherwise, this player wins as they still have atleast one battleship remaining
     else {
-        std::cout << p[nextPlayer()]->getName() << "WINS!\n";
+        std::cout << nextPlayer()->getName() << " WINS!\n";
     }
 
 }
 
 void Game::playTurn() {
        
-        std::size_t curPlayer = nextPlayer();
-        Board &curPlayerBoard = p[curPlayer]->getBoard();
-        Board &otherPlayerBoard = p[(curPlayer + 1) % 2]->getBoard();
+        // Get the current Player
+        Player* curPlayer = nextPlayer();
+        // Get the current player's board and their enemy's board
+        Board& curPlayerBoard = curPlayer->getBoard();
+        Board& otherPlayerBoard = otherPlayer()->getBoard();
 
-        std::cout << "\nTurn " << turn << " (" << p[curPlayer]->getName() << "):\n" << divider << "\n";
-        std::cout << p[curPlayer]->getName() <<", it's your turn:" << '\n';
+        // State who's turn it is and print the current state of the current player's board.
+        std::cout << "\nTurn " << turn << " (" << curPlayer->getName() << "):\n" << divider << "\n";
+        std::cout << curPlayer->getName() <<", it's your turn:" << '\n';
         std::cout << curPlayerBoard;
         
+        // Get a move from the current player
         Move m;
         do {
-        m = p[curPlayer]->getMove();
+        m = curPlayer->getMove();
         } while (!curPlayerBoard.isLegal(m));
 
+        // Execute the current player's move
         curPlayerBoard.makeMove(m, otherPlayerBoard, true);
         otherPlayerBoard.makeMove(m, curPlayerBoard, false);
 
-        std::cout << '\n' << divider << '\n' << p[curPlayer]->getName() << " shot at " << m.row << m.col << "!\n\n" << curPlayerBoard << '\n';
+        // Echo back where the player made their move and print the aftermath of their board.
+        std::cout << '\n' << divider << '\n' << curPlayer->getName() << " shot at " << m.row << m.col << "!\n\n" << curPlayerBoard << '\n';
 
         ++turn; // Increment the turn counter in preperation for the next turn
 }
@@ -104,8 +105,6 @@ void Game::play() {
         return;
     }
 
-
-    
     while(isRunning()) {
         // Run the next turn
         playTurn();

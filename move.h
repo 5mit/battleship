@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+// All of the member functions of Move are suitable for inlining so there is Move.cpp
+
 struct Move {
     std::size_t col;   // column number (0-9)
     char row;          // row letter (A-J) *uppercase*

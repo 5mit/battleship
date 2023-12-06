@@ -12,6 +12,7 @@ Move HumanPlayer::getMove() {
     
     Move move = Move();
 
+    // Keeps asking got user input until a syntactially valid move is given
     do {
         if (std::cin.fail()) {
             std::cin.clear();
